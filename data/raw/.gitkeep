@@ -1,0 +1,5 @@
+# This file exists only to make Git track this empty directory.
+# Place raw CSV dataset files here.
+# e.g. UNSW_NB15_training-set.csv
+#
+# Do NOT commit large CSV/PCAP files — they are excluded in .gitignore.
