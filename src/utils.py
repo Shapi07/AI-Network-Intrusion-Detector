@@ -20,7 +20,17 @@ import random
 import time
 from pathlib import Path
 from typing import Any, Callable
+import functools
+import json
+import random
+import time
+from pathlib import Path
+from typing import Any, Callable
 
+import numpy as np
+import pandas as pd  
+
+from src.config import configure_logging
 import numpy as np
 
 from src.config import configure_logging
@@ -188,6 +198,6 @@ def dataframe_memory_report(df: "pd.DataFrame") -> str:  # noqa: F821
     mem_bytes = df.memory_usage(deep=True).sum()
     mem_mb = mem_bytes / (1024 ** 2)
     return (
-        f"DataFrame: {df.shape[0]:,} rows × {df.shape[1]} columns | "
+        f"DataFrame: {df.shape[0]:,} rows x {df.shape[1]} columns | "
         f"Memory: {mem_mb:.2f} MB"
-    )
+)
