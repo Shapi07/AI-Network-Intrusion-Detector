@@ -28,17 +28,15 @@ RAW_DATA_DIR: Path = DATA_DIR / "raw"
 PROCESSED_DATA_DIR: Path = DATA_DIR / "processed"
 MODELS_DIR: Path = PROJECT_ROOT / "models"
 LOGS_DIR: Path = PROJECT_ROOT / "logs"
+REPORTS_DIR: Path = PROJECT_ROOT / "reports"
 
 # Ensure runtime directories exist (idempotent)
-for _dir in (RAW_DATA_DIR, PROCESSED_DATA_DIR, MODELS_DIR, LOGS_DIR):
+for _dir in (RAW_DATA_DIR, PROCESSED_DATA_DIR, MODELS_DIR, LOGS_DIR, REPORTS_DIR):
     _dir.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────
 # Data files
 # ──────────────────────────────────────────────────────────────
-# Default dataset name (UNSW-NB15 CSV).  The user can override
-# this by setting the AINID_DATASET env-var or passing a path
-# directly to the loader functions.
 DEFAULT_DATASET_FILENAME: str = os.getenv(
     "AINID_DATASET", "UNSW_NB15_training-set.csv"
 )
@@ -62,9 +60,6 @@ FEATURE_NAMES_PATH: Path = MODELS_DIR / FEATURE_NAMES_FILENAME
 # ──────────────────────────────────────────────────────────────
 # Target column
 # ──────────────────────────────────────────────────────────────
-# UNSW-NB15 uses "label" (0 = normal, 1 = attack).
-# CIC-IDS2017 uses " Label" (with a leading space — stripped
-# during preprocessing).
 TARGET_COLUMN: str = os.getenv("AINID_TARGET_COLUMN", "label")
 
 # Human-readable class names used in reports and charts
@@ -73,12 +68,9 @@ CLASS_NAMES: list[str] = ["Normal", "Attack"]
 # ──────────────────────────────────────────────────────────────
 # UNSW-NB15 — columns to drop
 # ──────────────────────────────────────────────────────────────
-# These columns are identifiers or have too many categories to
-# be useful without careful encoding.  Dropping them keeps the
-# feature space clean for the first training run.
 COLUMNS_TO_DROP: list[str] = [
-    "id",         # row identifier
-    "attack_cat", # attack category (multi-class; we do binary)
+    "id",           # row identifier
+    "attack_cat",   # attack category (multi-class; we do binary)
 ]
 
 # ──────────────────────────────────────────────────────────────
@@ -120,8 +112,6 @@ DECISION_TREE_PARAMS: dict = {
 # Evaluation
 # ──────────────────────────────────────────────────────────────
 METRICS_REPORT_PATH: Path = MODELS_DIR / "metrics_report.json"
-
-# Number of top features to display in feature-importance charts
 TOP_N_FEATURES: int = 20
 
 # ──────────────────────────────────────────────────────────────
@@ -136,20 +126,9 @@ LOG_FILE: Path = LOGS_DIR / "ainid.log"
 def configure_logging(name: str = "ainid") -> logging.Logger:
     """
     Create and return a logger with both console and file handlers.
-
-    Parameters
-    ----------
-    name : str
-        Logger name — typically ``__name__`` of the calling module.
-
-    Returns
-    -------
-    logging.Logger
-        Configured logger instance.
     """
     logger = logging.getLogger(name)
 
-    # Avoid adding duplicate handlers on repeated calls
     if logger.handlers:
         return logger
 
@@ -157,12 +136,10 @@ def configure_logging(name: str = "ainid") -> logging.Logger:
 
     formatter = logging.Formatter(LOG_FORMAT, datefmt=LOG_DATE_FORMAT)
 
-    # Console handler
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
     logger.addHandler(stream_handler)
 
-    # File handler
     file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
