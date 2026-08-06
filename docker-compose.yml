@@ -1,0 +1,30 @@
+services:
+  ainid-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ainid-ui:latest
+    container_name: ainid-ui
+    ports:
+      - "8501:8501"
+    volumes:
+      # Модель/скейлер/feature_names — уже обученные артефакты (Фаза 5)
+      - ./models:/app/models
+      # JSON-отчёты об оценке (Фаза 6)
+      - ./reports:/app/reports
+      # Результаты предсказаний (Фаза 7) — остаются на хосте после остановки контейнера
+      - ./predictions:/app/predictions
+      # Логи пайплайна
+      - ./logs:/app/logs
+      # Сырые/обработанные данные, если нужно подложить датасет в контейнер
+      - ./data:/app/data
+    environment:
+      - AINID_TARGET_COLUMN=label
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

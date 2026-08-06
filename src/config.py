@@ -29,9 +29,10 @@ PROCESSED_DATA_DIR: Path = DATA_DIR / "processed"
 MODELS_DIR: Path = PROJECT_ROOT / "models"
 LOGS_DIR: Path = PROJECT_ROOT / "logs"
 REPORTS_DIR: Path = PROJECT_ROOT / "reports"
+PREDICTIONS_DIR: Path = PROJECT_ROOT / "predictions"
 
 # Ensure runtime directories exist (idempotent)
-for _dir in (RAW_DATA_DIR, PROCESSED_DATA_DIR, MODELS_DIR, LOGS_DIR, REPORTS_DIR):
+for _dir in (RAW_DATA_DIR, PROCESSED_DATA_DIR, MODELS_DIR, LOGS_DIR, REPORTS_DIR, PREDICTIONS_DIR):
     _dir.mkdir(parents=True, exist_ok=True)
 
 # ──────────────────────────────────────────────────────────────
@@ -56,6 +57,12 @@ MODEL_PATH: Path = MODELS_DIR / MODEL_FILENAME
 SCALER_PATH: Path = MODELS_DIR / SCALER_FILENAME
 LABEL_ENCODER_PATH: Path = MODELS_DIR / LABEL_ENCODER_FILENAME
 FEATURE_NAMES_PATH: Path = MODELS_DIR / FEATURE_NAMES_FILENAME
+
+# ──────────────────────────────────────────────────────────────
+# Phase 7 — Prediction pipeline output
+# ──────────────────────────────────────────────────────────────
+DEFAULT_PREDICTIONS_FILENAME: str = "predictions.csv"
+DEFAULT_PREDICTIONS_PATH: Path = PREDICTIONS_DIR / DEFAULT_PREDICTIONS_FILENAME
 
 # ──────────────────────────────────────────────────────────────
 # Target column
