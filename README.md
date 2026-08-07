@@ -8,7 +8,7 @@
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.4%2B-F7931E?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35%2B-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![CI/CD](https://img.shields.github/actions/workflow/status/Shapi07/AINID/ci.yml?branch=main&label=CI%2FCD&logo=github)](https://github.com/Shapi07/AINID/actions)
+[![CI/CD](https://img.shields.github/actions/workflow/status/Shapi07/AI-Network-Intrusion-Detector/ci.yml?branch=main&label=CI%2FCD&logo=github)](https://github.com/Shapi07/AI-Network-Intrusion-Detector/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 
