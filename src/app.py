@@ -17,12 +17,23 @@ AINID — AI Network Intrusion Detector — Streamlit dashboard.
 Расположение: файл должен находиться в КОРНЕ проекта (рядом с папками src/, models/, reports/),
 чтобы импорты `from src...` работали без дополнительной настройки.
 """
-
 from __future__ import annotations
 
-import io
 import sys
 from pathlib import Path
+
+# Добавляем корень проекта в системный путь Python, чтобы работали импорты из src
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+import io
+from typing import Any
+
+import joblib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import streamlit as st
 from typing import Any
 
 import joblib
