@@ -20,11 +20,13 @@
 - [🎯 Overview](#-overview)
 - [🏗️ Architecture & Project Structure](#️-architecture--project-structure)
 - [📊 ML Pipeline & Results](#-ml-pipeline--results)
+- [📡 Phase 12 — Real-Time Network Traffic Analysis](#-phase-12--real-time-network-traffic-analysis-experimental-extension)
 - [🖥️ Streamlit Dashboard](#️-streamlit-dashboard)
 - [⚙️ Installation & Quick Start](#️-installation--quick-start)
 - [🧪 Testing & CI/CD](#-testing--cicd)
 - [🔮 Future Improvements](#-future-improvements)
 - [📜 License](#-license)
+
 
 ---
 
@@ -314,7 +316,65 @@ pytest --cov=src tests/
 
 ---
 
+## 📡 Phase 12 — Real-Time Network Traffic Analysis (Experimental Extension)
+
+> **Notice:** Phase 12 is an **experimental portfolio NIDS extension** that adds live network packet capture and flow aggregation capabilities to the existing AINID system.
+
+### Overview & Architecture
+Phase 12 captures real network traffic from local interfaces using **Scapy**, aggregates packets into bidirectional 5-tuple flows, extracts statistical flow features (`duration`, `src_bytes`, `dst_bytes`, `protocol_type`, `service`, `flag`), and routes compatible flow DataFrames directly to the existing AINID inference pipeline (`src/predict.py`).
+
+```
+Real Network Traffic ──▶ Scapy Sniffer (src/live_capture.py)
+                              │
+                              ▼
+                 Bidirectional 5-Tuple Aggregation
+             (src_ip, dst_ip, src_port, dst_port, proto)
+                              │
+                              ▼
+                   Flow Feature Extraction
+             (duration, bytes, pkts, rates, flags)
+                              │
+                              ▼
+                Feature Validation & ML Check
+             ├─► [Compatible]   ──▶ src.predict.predict ──▶ Live Monitor Verdict
+             └─► [Incompatible] ──► "LIVE MODEL INCOMPATIBLE" Diagnostic Report
+```
+
+### Key Components & Features
+- **Packet Capture (`Scapy`)**: Configurable capture window (duration timeout and packet limit bounds).
+- **Bidirectional 5-Tuple Aggregation**: Sorts IP and port pairs canonically so forward ($A \rightarrow B$) and reverse ($B \rightarrow A$) packets are grouped into a single connection flow.
+- **Statistical Feature Derivation**: Computes flow duration (guaranteed $\ge 0$), directional byte/packet totals, rates, average packet sizes, inferred services (`http`, `dns`, `smtp`, `ftp`, `eco_i`), and TCP flag states (`SF`, `S0`, `REJ`).
+- **Strict ML Compatibility Verification**: Before running inference, `validate_live_features()` checks whether the model requires lab testbed-specific features (`ct_srv_src`, `ct_dst_ltm`, etc.) that cannot be extracted from live packet flows. If unsupported features are required, the system **rejects fake predictions** and outputs a `LIVE MODEL INCOMPATIBLE` diagnostic report instead of substituting arbitrary zeros.
+
+### Windows Requirements & Permissions
+- **Packet Capture Driver**: Requires [Npcap](https://npcap.com/) (or WinPcap) installed in WinPcap-compatible mode.
+- **Administrator Privileges**: Raw socket sniffing on Windows requires running the command prompt or terminal with **Administrator privileges**.
+
+### CLI Usage Commands
+```bash
+# List all available network capture interfaces
+python -m src.live_capture --list-interfaces
+
+# Capture live traffic on default interface for 10 seconds (max 1000 packets)
+python -m src.live_capture --duration 10 --max-packets 1000
+
+# Capture traffic on a specific interface
+python -m src.live_capture --interface "Wi-Fi" --duration 15 --max-packets 500
+```
+
+### Security Boundary & Defensive Scope
+- **Defensive Monitoring ONLY**: Monitors authorized local interfaces (localhost, user's own machine/Wi-Fi/lab).
+- **No Payload Collection**: Extracts transport/network layer metadata and statistical metrics only; never harvests application payloads or credentials.
+- **No Offensive Mechanisms**: Contains zero packet injection, modification, or exploit automation capabilities.
+
+### Limitations
+- **Distribution Shift**: Live host network traffic patterns differ from offline lab benchmark datasets (UNSW-NB15/CIC-IDS2017).
+- **Experimental Classifier**: Live verdicts are provided as experimental alerts for monitoring prototypes, not production SOC firewalls.
+
+---
+
 ## 🔮 Future Improvements
+
 
 - [ ] Train and publish benchmark metrics on the full UNSW-NB15 / CIC-IDS2017
       datasets (current in-repo report is a smoke-test artifact only).
